@@ -11,7 +11,7 @@ st.set_page_config(page_title="Knowledge Updater", layout="wide")
 if 'history' not in st.session_state:
     st.session_state.history = []
 
-st.title("📘 AI Knowledge Updater")
+st.title("📘 Dynamic Knowledge Updater")
 
 # --- Topic Fetch Section ---
 with st.expander("📥 Fetch & Store New Topic"):
@@ -39,7 +39,6 @@ if st.button("Generate Response"):
         with st.spinner("Searching knowledge base..."):
             relevant = search_index(query, k=3)
 
-            # If we found relevant docs, use them first
             if relevant:
                 context = "\n".join(relevant)
                 prompt = f"""You are a helpful assistant. Answer the question strictly using the context below.
@@ -53,8 +52,8 @@ Answer:"""
 
                 response = get_fallback_response(prompt)
 
-                # ✅ Fallback if Gemini still returns a weak/unrelated answer
-                if any(keyword in response.lower() for keyword in ["does not contain", "no information", "not found"]):
+                # ✅ If response is weak or generic, let Gemini answer freely
+                if any(keyword in response.lower() for keyword in ["does not contain", "no information", "not found", "not specified"]):
                     response = get_fallback_response(query)
 
             else:
